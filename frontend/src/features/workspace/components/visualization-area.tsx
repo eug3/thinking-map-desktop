@@ -191,23 +191,54 @@ function VisualizationAreaInner({ mapID }: VisualizationAreaInnerProps) {
   // Listen for node events from Go backend
   useEffect(() => {
     const offNodeCreated = Events.On('nodeCreated', (event: any) => {
-      const data = event.data;
-      if (!data) return;
-      const node = toReactFlowNode(data);
-      node.data = {
-        ...node.data,
-        onEdit: handleNodeEdit,
-        onDelete: handleNodeDelete,
-        onAddChild: handleAddChild,
-        onSelect: handleNodeSelect,
-        onDoubleClick: handleNodeDoubleClick,
+      // Event data can be either:
+      // 1. Direct node data (from Emit with map[string]interface{})
+      // 2. EventData wrapper (from EmitNodeEvent with {type, nodeId, data})
+      let nodeData = event.data;
+      if (!nodeData) return;
+
+      // If wrapped in EventData format, extract from inner data
+      if (nodeData.type === 'nodeCreated' && nodeData.data) {
+        nodeData = nodeData.data;
+      }
+
+      // Ensure we have an id field
+      if (!nodeData.id && nodeData.nodeId) {
+        nodeData.id = nodeData.nodeId;
+      }
+
+      if (!nodeData.id) {
+        console.error('nodeCreated event missing id:', event.data);
+        return;
+      }
+
+      // Build the ReactFlow node directly
+      const node: Node<CustomNodeModel> = {
+        id: nodeData.id,
+        type: 'custom',
+        position: nodeData.position || { x: 0, y: 0 },
+        data: {
+          id: nodeData.id,
+          parentID: nodeData.parentID || nodeData.parentId || '',
+          nodeType: nodeData.nodeType || 'sub_question',
+          question: nodeData.question || '',
+          target: nodeData.target || '',
+          status: nodeData.status || 'pending',
+          onEdit: handleNodeEdit,
+          onDelete: handleNodeDelete,
+          onAddChild: handleAddChild,
+          onSelect: handleNodeSelect,
+          onDoubleClick: handleNodeDoubleClick,
+        },
       };
+
       actions.addNode(node);
-      if (data.parentID) {
+      const parentID = nodeData.parentID || nodeData.parentId;
+      if (parentID) {
         actions.addEdge({
-          id: `${data.parentID}-${data.id}`,
-          source: data.parentID,
-          target: data.id,
+          id: `${parentID}-${nodeData.id}`,
+          source: parentID,
+          target: nodeData.id,
           type: 'default',
           style: { stroke: '#3b82f6', strokeWidth: 2 },
         });
