@@ -50,3 +50,4 @@ frontend/node_modules/
 .task/checksum/
 build/*
 data/*
+nul
