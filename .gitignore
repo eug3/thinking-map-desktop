@@ -45,3 +45,8 @@ __debug_bin*
 .vercel/project.json
 
 web/.pnpm-store/*
+tmpclaude*
+frontend/node_modules/
+.task/checksum/
+build/*
+data/*

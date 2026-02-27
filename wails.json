@@ -1,0 +1,24 @@
+{
+  "name": "ThinkingMap",
+  "outputFileName": "ThinkingMap",
+  "frontend": {
+    "install": "npm install",
+    "build": "npm run build",
+    "devWatch": "npm run dev",
+    "devServerUrl": "auto",
+    "packageManager": "npm"
+  },
+  "author": {
+    "name": "ThinkingMap",
+    "email": "noreply@example.com"
+  },
+  "info": {
+    "companyName": "ThinkingMap",
+    "productName": "ThinkingMap",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright 2025",
+    "comments": "AI-Powered Thinking Map Desktop Application"
+  },
+  "wailsJsDir": "./frontend/wailsjs",
+  "version": "3"
+}
